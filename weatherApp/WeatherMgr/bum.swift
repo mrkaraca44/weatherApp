@@ -24,7 +24,6 @@ struct WeatherResponse: Codable {
         case currentUnits = "current_units"
         case current
     }
-    
 }
 
 // MARK: - Current

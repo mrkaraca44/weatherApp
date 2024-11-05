@@ -6,19 +6,43 @@
 //
 
 import UIKit
-import Lottie
 
-class ViewController: UIViewController {
-
-    @IBOutlet weak var image: LottieAnimationView!
+class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
+    
+    @IBOutlet weak var cityNameLabel: UILabel!
+    @IBOutlet weak var pickerView: UIPickerView!
     @IBOutlet weak var degree: UILabel!
     var weatherCondition:String?
     
+    let cities: [CityInfo] = [.malatya,.istanbul,.ankara,.izmir,.elazig]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        pickerView.dataSource = self
+        pickerView.delegate = self
+        cityNameLabel.text = cities[0].rawValue
+
         
         // Do any additional setup after loading the view.
-        NetworkManager.shared.getWeatherResponse(){ [weak self] weatherData in
+       
+    }
+    
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return cities.count
+    }
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return cities[row].rawValue
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        cityNameLabel.text = cities[row].rawValue
+        let coordinates = CityInfo.coordinates(for: cities[row])
+        
+        NetworkManager.shared.getWeatherResponse(latitude: coordinates.latitude,longitude: coordinates.longitude){ [weak self] weatherData in
             guard let self else{
                 return
             }
@@ -26,35 +50,8 @@ class ViewController: UIViewController {
             DispatchQueue.main.async {
                 self.degree.text = degre
             }
-            
-            let weatherConditionType = WeatherCondition.set(for: weatherData.current.weather_code)
-            getWeatherCondition(weatherCondition: weatherConditionType.rawValue)
-            
         }
-       
     }
     
-    func getWeatherCondition(weatherCondition:String){
-        
-        
-        image.loopMode = .loop
-        
-        let url = Bundle.main.url(forResource: weatherCondition,
-                                  withExtension: "lottie")!
-        DotLottieFile.loadedFrom(url: url) { [weak self] result in
-            guard let self else {
-                return
-            }
-            switch result {
-            case .success(let success):
-                image.loadAnimation(from:
-                success)
-                image.play()
-            case .failure(let failure):
-                print(failure)
-            }
-        }
-       
-    }
 }
 

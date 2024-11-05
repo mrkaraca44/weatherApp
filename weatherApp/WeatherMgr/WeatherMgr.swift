@@ -13,8 +13,8 @@ class NetworkManager {
     typealias Completion = (WeatherResponse) -> Void
      
     
-    public func getWeatherResponse(completion: @escaping Completion) {
-        let url = URL(string: "https://api.open-meteo.com/v1/forecast?latitude=38.35&longitude=38.31&current=temperature_2m,weather_code%2Cwind_speed_10m")!
+    public func getWeatherResponse(latitude: String ,longitude: String ,completion: @escaping Completion) {
+        let url = URL(string: "https://api.open-meteo.com/v1/forecast?latitude=\(latitude)&longitude=\(longitude)&current=temperature_2m,weather_code%2Cwind_speed_10m")!
 
        let request = URLRequest(url: url)
 
